@@ -25,7 +25,7 @@
         "save": true
     },
     "reasoning-execution-steps": {
-        "template-system": "",
+        "template-system": " ",
         "template-user": "[FAILURE_REASON]\nQ: Extract time steps from the above sentence (separated by comma).\n A:",
         "params": {
             "max_tokens": 256,

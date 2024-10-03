@@ -1,31 +1,31 @@
 import os
 import time
+import google.generativeai as genai
 import openai
+import os
 import json
 import datetime
 import numpy as np
 
 class LLMPrompter():
-    def __init__(self, gpt_version, api_key) -> None:
+    def __init__(self, gpt_version, api_key_str) -> None:
         self.gpt_version = gpt_version
-        if api_key is None:
+        if api_key_str is None:
             raise ValueError("OpenAI API key is not provided.")
         else:
-            openai.api_key = api_key
+            print(api_key_str)
+            genai.configure(api_key=api_key_str)
 
     def query(self, prompt: str, sampling_params: dict, save: bool, save_dir: str) -> str:
         while True:
             try:
-                if 'gpt-4' in self.gpt_version:
-                    response = openai.ChatCompletion.create(
-                        model=self.gpt_version,
-                        messages=[
-                                {"role": "system", "content": prompt['system']},
-                                {"role": "user", "content": prompt['user']},
-                            ],
-                        **sampling_params
-                        )
-                    # print("response: ", response)
+                if 'gemini-1.5-flash' in self.gpt_version:
+                    print(prompt['system'])
+                    print(prompt['user'])
+                    model = genai.GenerativeModel(self.gpt_version, 
+                                                  system_instruction = prompt['system'])
+                    response = model.generate_content(prompt['user'])
+                    print(response)
                 else:
                     response = openai.Completion.create(
                         model=self.gpt_version,
@@ -48,11 +48,12 @@ class LLMPrompter():
                     output = prev_response
 
             with open(os.path.join(save_dir, 'response.json'), 'w') as f:
-                if 'gpt-4' in self.gpt_version:
+                if 'gemini-1.5-flash' in self.gpt_version:
                     output[key] = {
                                 'prompt': prompt,
                                 'sampling_params': sampling_params,
-                                'response': response['choices'][0]['message']["content"].strip()
+                                'response': response._result.candidates[0].content.parts[0].text.strip()
+
                             }
                 else:
                     output[key] = {
@@ -63,8 +64,8 @@ class LLMPrompter():
                             }
                 json.dump(output, f, indent=4)
             
-        if 'gpt-4' in self.gpt_version:
-            return response['choices'][0]['message']["content"].strip(), None
+        if 'gemini-1.5-flash' in self.gpt_version:
+            return response._result.candidates[0].content.parts[0].text.strip(), None
         else:
             return response['choices'][0]['text'].strip(), np.mean(response['choices'][0]['logprobs']['token_logprobs'])
 
