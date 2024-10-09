@@ -13,7 +13,6 @@ class LLMPrompter():
         if api_key_str is None:
             raise ValueError("OpenAI API key is not provided.")
         else:
-            print(api_key_str)
             genai.configure(api_key=api_key_str)
 
     def query(self, prompt: str, sampling_params: dict, save: bool, save_dir: str) -> str:
