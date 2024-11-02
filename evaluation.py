@@ -19,7 +19,7 @@ from LLM.prompt import LLMPrompter
 from pathlib import Path
 from main.constants import *
 
-API_KEY= None
+API_KEY= ''
 llm_prompter = LLMPrompter(gpt_version="gemini-1.5-flash", api_key_str=API_KEY)
 
 def show_video(video_path, video_width=300):
