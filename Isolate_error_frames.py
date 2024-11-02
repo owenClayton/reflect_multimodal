@@ -1,12 +1,30 @@
 import cv2
-failed_list = ['heatPotato-1', 'cookEgg-8', 'makeCoffee-2', 'switchDevices-8', 'toastBread-1', 'warmWater-9', 'waterPlant-2', 'waterPlant-6', 'makeSalad-5', 'makeSalad-10'] #maybe just make new folder of failed tasks to eval
+import json
+import os 
+from datetime import datetime, timedelta
+
 video_folder = ''
 reasoning_folder = ''
 # call on thor_tasks folder for video and state_summary folder for the frames to isolate. Isolate 4 frames (one before predicted, one at predicted(might be multiple), and one after predicted). See what is produced.
 # save these frames in the state_summary folder. 
-video = cv2.VideoCapture('/pub0/oclayton/reflect_multimodal/completed_tasks/boilWater/boilWater-1/original-video.mp4')
-fps = video.get(cv2.CAP_PROP_FPS)
-print(fps)
-video.set(cv2.CAP_PROP_POS_FRAMES, 3)
-ret, frame = video.read()
-cv2.imwrite('my_video_frame.png', frame)
+
+simPath = '/pub0/oclayton/reflect_multimodal/main/failed_tasks/state_summary'
+for root1, dirs1, files1 in os.walk(simPath):
+    for dir1 in dirs1:
+        pathToTasks = os.path.join(root1, dir1)
+        with open(f'{pathToTasks}/reasoning.json') as f:
+            reasoning = json.load(f)
+            failure_times = reasoning["pred_failure_step"]
+            frame_snip_times = []
+            for time in failure_times:
+                time_obj = datetime.strptime(time, "%M:%S")
+                frame_snip_times.append(time_obj.minute*60 + time_obj.second  -1)
+                frame_snip_times.append(time_obj.minute*60 + time_obj.second)
+                frame_snip_times.append(time_obj.minute*60 + time_obj.second + 1)
+            video = cv2.VideoCapture(f'/pub0/oclayton/reflect_multimodal/main/failed_tasks/thor_tasks/{dir1}/original-video.mp4')
+            for frame_time in frame_snip_times: 
+                video.set(cv2.CAP_PROP_POS_FRAMES, frame_time)
+                ret, frame = video.read()
+                cv2.imwrite(f'{pathToTasks}/{frame_time}.png', frame)
+    break
+
