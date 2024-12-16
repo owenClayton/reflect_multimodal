@@ -14,17 +14,36 @@ class LLMPrompter():
             raise ValueError("OpenAI API key is not provided.")
         else:
             genai.configure(api_key=api_key_str)
+    
+    def upload_video(self, videoPath) -> str:
+        try: 
+            video_file = genai.upload_file(path = videoPath)
+            while video_file.state.name == "PROCESSING":
+                time.sleep(5)
+                video_file = genai.get_file(video_file.name)
+            if(video_file.state.name == "FAILED"):
+                raise ValueError(video_file.state.name)
+        except Exception as e:
+                print("Video Upload Failed... ", e)
+        return(video_file.name)
+    
 
-    def query(self, prompt: str, sampling_params: dict, save: bool, save_dir: str) -> str:
+    def query(self, prompt: str, sampling_params: dict, save: bool, save_dir: str, videoName = '') -> str:
         while True:
             try:
                 if 'gemini-1.5-flash' in self.gpt_version:
                     print(prompt['system'])
                     print(prompt['user'])
-                    model = genai.GenerativeModel(self.gpt_version, 
-                                                  system_instruction = prompt['system'])
-                    response = model.generate_content(prompt['user'])
-                    print(response)
+                    if (videoName == ''):
+                        model = genai.GenerativeModel(self.gpt_version, 
+                                                    system_instruction = prompt['system'])
+                        response = model.generate_content(prompt['user'], 
+                                                        generation_config=genai.types.GenerationConfig(**sampling_params))
+                    else: 
+                        video_file = genai.get_file(videoName)
+                        model = genai.GenerativeModel(self.gpt_version, 
+                                                    system_instruction = prompt['system'])
+                        response = model.generate_content([video_file, prompt['user']], generation_config=genai.types.GenerationConfig(**sampling_params))
                 else:
                     response = openai.Completion.create(
                         model=self.gpt_version,

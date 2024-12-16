@@ -18,13 +18,15 @@ for root1, dirs1, files1 in os.walk(simPath):
             frame_snip_times = []
             for time in failure_times:
                 time_obj = datetime.strptime(time, "%M:%S")
-                frame_snip_times.append(time_obj.minute*60 + time_obj.second  -1)
+                frame_snip_times.append(time_obj.minute*60 + time_obj.second  -3)
                 frame_snip_times.append(time_obj.minute*60 + time_obj.second)
-                frame_snip_times.append(time_obj.minute*60 + time_obj.second + 1)
+                frame_snip_times.append(time_obj.minute*60 + time_obj.second + 3)
             video = cv2.VideoCapture(f'/pub0/oclayton/reflect_multimodal/main/failed_tasks/thor_tasks/{dir1}/original-video.mp4')
             for frame_time in frame_snip_times: 
                 video.set(cv2.CAP_PROP_POS_FRAMES, frame_time)
                 ret, frame = video.read()
-                cv2.imwrite(f'{pathToTasks}/{frame_time}.png', frame)
+                if(ret):
+                    cv2.imwrite(f'{pathToTasks}/{frame_time}.png', frame)
+                
     break
 

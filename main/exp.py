@@ -265,7 +265,8 @@ def run_reasoning(folder_name, llm_prompter, global_sg):
     print(">>> Run step-by-step subgoal-level analysis...")
     selected_caption = ""
     prompt = {}
-
+    video_path = f'thor_tasks/{folder_name}/original-video.mp4'
+    video_name = llm_prompter.upload_video(video_path)
     for caption in L2_captions:
         print(">>> Verify subgoal...")
         subgoal = caption.split(". ")[1].split(": ")[1].lower()
@@ -274,7 +275,7 @@ def run_reasoning(folder_name, llm_prompter, global_sg):
         prompt['user'] = prompt_info['subgoal-verifier']['template-user'].replace("[SUBGOAL]", subgoal).replace("[OBSERVATION]", caption[caption.find("Visual observation"):])
 
         ans, _  = llm_prompter.query(prompt=prompt, sampling_params=prompt_info['subgoal-verifier']['params'], 
-                                    save=prompt_info['subgoal-verifier']['save'], save_dir=save_dir)
+                                    save=prompt_info['subgoal-verifier']['save'], save_dir=save_dir, videoName = video_name)
         is_success = int(ans.split(", ")[0] == "Yes")
         if is_success == 0:
             selected_caption = caption
