@@ -43,8 +43,8 @@ Issues or pull requests are welcome!
 1. Download the sim_data.zip file, and upload it to the local cloned repository. 
 2. Unzip the file and place all of the subfolders (ie. boilWater) in the [thor_tasks](https://github.com/owenClayton/reflect_multimodal/tree/main/main/thor_tasks) folder. 
 3. Generate a Gemini API key and run [evaluation.py](https://github.com/owenClayton/reflect_multimodal/blob/main/evaluation.py)
-4. Look at results in the [state_summary](https://github.com/owenClayton/reflect_multimodal/tree/main/main/state_summary) folder, specifically `reasoning.json` and `replan.json`
-Note: If the evaluation file fails part way through, it is easiest to move the completed thor_tasks to a "completed" folder to speed up the process when you rerun it. 
+4. Look at results in the [state_summary](https://github.com/owenClayton/reflect_multimodal/tree/main/main/state_summary) folder, specifically `reasoning.json` and `replan.json`  
+Note: If the evaluation file fails part way through, it is easiest to move the completed thor_tasks to a "completed" folder to speed up the process when you rerun it.  
 Note 2: There are currently open issues on the REFLECT repository about using the real world data, these may help implementation once they are responded to. 
 
 ## Extensions
